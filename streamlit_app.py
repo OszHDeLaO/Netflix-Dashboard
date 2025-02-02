@@ -1,9 +1,9 @@
-import streamlit as st
+
 import pandas as pd
-import plotly.express as px
+import altair as alt
 
 # Function to load the dataset (cached for performance)
-@st.cache_data  
+@st.cache_data
 def load_data():
     file_path = "netflix_titles.csv"  # Update with your file path if needed
     df = pd.read_csv(file_path)
@@ -17,31 +17,37 @@ def main():
     # Sidebar filters
     st.sidebar.title("Filters")
     year = st.sidebar.selectbox("Select Release Year", options=["All"] + sorted(df["release_year"].dropna().unique(), reverse=True))
-    
-    # Theme mapping for color scales
-    theme_mapping = {
-        "Plotly": "plotly3",
-        "Seaborn": "icefire",
-        "Viridis": "viridis",
-        "Blackbody": "blackbody",
-        "Cividis": "cividis"
-    }
-    theme = st.sidebar.selectbox("Select Color Theme", options=list(theme_mapping.keys()))
 
     # Apply year filter
     if year != "All":
         df = df[df["release_year"] == int(year)]
 
     # Title of the dashboard
-    st.title("Netflix Data Dashboard")
+    st.title("Netflix Data Dashboard (Simplified)")
 
-    # Scatter Plot: Release Year Distribution
-    st.subheader("Release Year Distribution")
-    fig_scatter = px.scatter(df, x=df.index, y="release_year", title="Scatter Plot of Release Years", color_discrete_sequence=["red"])
-    st.plotly_chart(fig_scatter)
+    # 1. Bar Chart: Top 10 Countries with Most Content
+    st.subheader("Top 10 Countries with Most Content")
+    top_countries = df["country"].value_counts().head(10)
+    st.bar_chart(top_countries)  # Streamlit's built-in bar chart
 
-    # World Map: Number of Entries Per Country
-    st.subheader("Netflix Entries by Country")
-    country_counts = df["country"].dropna().str.split(", ").explode().value_counts().reset_index()
-    country_counts.columns = ["Country", "Count"]
-    fig_map = px.choropleth
+    # 2. Line Chart: Number of Releases Over Time
+    st.subheader("Number of Releases Over Time")
+    releases_over_time = df.groupby("release_year")["show_id"].count().reset_index()
+    st.line_chart(releases_over_time.set_index("release_year"))  # Streamlit's built-in line chart
+
+    # 3. Pie Chart: Movies vs. TV Shows
+    st.subheader("Movies vs. TV Shows")
+    type_counts = df["type"].value_counts()
+    st.pie_chart(type_counts)  # Streamlit's built-in pie chart
+
+    # 4. Area Chart: Distribution of Ratings
+    st.subheader("Distribution of Ratings")
+    rating_counts = df["rating"].value_counts().sort_index()
+    st.area_chart(rating_counts)  # Streamlit's built-in area chart
+  
+    # Data Source
+    st.write("Data Source: Netflix Titles Dataset")
+
+# Entry point for the script
+if __name__ == "__main__":
+    main()
