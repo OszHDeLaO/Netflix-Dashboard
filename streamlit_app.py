@@ -38,7 +38,7 @@ def main():
     # 3. Pie Chart: Movies vs. TV Shows
     st.subheader("Movies vs. TV Shows")
     type_counts = df["type"].value_counts()
-    st.pie_chart(type_counts)  # Streamlit's built-in pie chart
+    st.pie_chart(type_counts, labels=type_counts.index) 
 
     # 4. Area Chart: Distribution of Ratings
     st.subheader("Distribution of Ratings")
