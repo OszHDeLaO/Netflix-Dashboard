@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+streamlit==1.28.1  # Or your preferred Streamlit version
+    pandas==2.0.3  # Or your preferred pandas version
+    plotly==5.15.0  # Or your preferred plotly version
 
 # Ensure Streamlit runs correctly
 if __name__ == "__main__":
