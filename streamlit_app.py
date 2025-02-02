@@ -37,7 +37,7 @@ if __name__ == "__main__":
     # Scatter Plot: Release Year
     st.subheader("Release Year Distribution")
     fig_scatter = px.scatter(df, x=df.index, y="release_year", title="Scatter Plot of Release Years", color_discrete_sequence=["red"])
-    st.plotly_chart(fig_scatter)
+   
 
     # World Map: Number of Entries Per Country
     st.subheader("Netflix Entries by Country")
