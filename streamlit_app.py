@@ -1,9 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-streamlit==1.28.1  # Or your preferred Streamlit version
-    pandas==2.0.3  # Or your preferred pandas version
-    plotly==5.15.0  # Or your preferred plotly version
+
 
 # Ensure Streamlit runs correctly
 if __name__ == "__main__":
@@ -21,6 +19,10 @@ if __name__ == "__main__":
     year = st.sidebar.selectbox("Select Release Year", options=["All"] + sorted(df["release_year"].dropna().unique(), reverse=True))
     
     # Theme mapping (fix for the colorscale issue)
+    streamlit==1.28.1  # Or your preferred Streamlit version
+    pandas==2.0.3  # Or your preferred pandas version
+    plotly==5.15.0  # Or your preferred plotly version
+    
     theme_mapping = {
         "Plotly": "plotly3",
         "Seaborn": "icefire",
