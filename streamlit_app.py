@@ -1,13 +1,16 @@
+!pip install streamlit matplotlib seaborn
+
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Ensure Streamlit runs correctly
 if __name__ == "__main__":
     # Load the dataset
     @st.cache_data
     def load_data():
-        file_path = "netflix_titles.csv"  # Update with your file path if needed
+        file_path = "/mnt/data/netflix_titles.csv"
         df = pd.read_csv(file_path)
         return df
 
@@ -16,16 +19,6 @@ if __name__ == "__main__":
     # Sidebar filters
     st.sidebar.title("Filters")
     year = st.sidebar.selectbox("Select Release Year", options=["All"] + sorted(df["release_year"].dropna().unique(), reverse=True))
-    
-    # Theme mapping (fix for the colorscale issue)
-    theme_mapping = {
-        "Plotly": "plotly3",
-        "Seaborn": "icefire",
-        "Viridis": "viridis",
-        "Blackbody": "blackbody",
-        "Cividis": "cividis"
-    }
-    theme = st.sidebar.selectbox("Select Color Theme", options=list(theme_mapping.keys()))
 
     # Apply year filter
     if year != "All":
@@ -36,28 +29,38 @@ if __name__ == "__main__":
 
     # Scatter Plot: Release Year
     st.subheader("Release Year Distribution")
-    fig_scatter = px.scatter(df, x=df.index, y="release_year", title="Scatter Plot of Release Years", color_discrete_sequence=["red"])
-   
+    fig, ax = plt.subplots()
+    ax.scatter(df.index, df["release_year"], color="red", alpha=0.5)
+    ax.set_title("Scatter Plot of Release Years")
+    ax.set_xlabel("Index")
+    ax.set_ylabel("Release Year")
+    st.pyplot(fig)
 
-    # World Map: Number of Entries Per Country
+    # Bar Chart: Number of Entries Per Country
     st.subheader("Netflix Entries by Country")
-    country_counts = df["country"].dropna().str.split(", ").explode().value_counts().reset_index()
-    country_counts.columns = ["Country", "Count"]
-    fig_map = px.choropleth(country_counts, locations="Country", locationmode="country names", color="Count",
-                             color_continuous_scale=theme_mapping[theme], title="Number of Netflix Entries by Country")  # Use theme_mapping
-    st.plotly_chart(fig_map)
+    country_counts = df["country"].dropna().str.split(", ").explode().value_counts().head(10)
+    fig, ax = plt.subplots()
+    country_counts.plot(kind="bar", ax=ax, color="blue")
+    ax.set_title("Top 10 Countries by Number of Netflix Entries")
+    ax.set_xlabel("Country")
+    ax.set_ylabel("Count")
+    st.pyplot(fig)
 
     # Donut Chart: Movies vs TV Shows
     st.subheader("Movies vs TV Shows")
-    type_counts = df["type"].value_counts().reset_index()
-    type_counts.columns = ["Type", "Count"]
-    fig_pie = px.pie(type_counts, values="Count", names="Type", hole=0.4, title="Movies vs TV Shows",
-                     color_discrete_sequence=px.colors.qualitative.Set3)
-    st.plotly_chart(fig_pie)
+    type_counts = df["type"].value_counts()
+    fig, ax = plt.subplots()
+    wedges, texts, autotexts = ax.pie(type_counts, labels=type_counts.index, autopct="%1.1f%%", colors=["lightblue", "lightcoral"], wedgeprops=dict(width=0.4))
+    ax.set_title("Movies vs TV Shows")
+    st.pyplot(fig)
 
     # Histogram: Rating Distribution
     st.subheader("Rating Distribution")
-    fig_hist = px.histogram(df, x="rating", title="Histogram of Ratings", color_discrete_sequence=["blue"])
-    st.plotly_chart(fig_hist)
+    fig, ax = plt.subplots()
+    sns.histplot(df["rating"].dropna(), bins=10, kde=True, ax=ax, color="purple")
+    ax.set_title("Histogram of Ratings")
+    ax.set_xlabel("Rating")
+    ax.set_ylabel("Count")
+    st.pyplot(fig)
 
-    st.write("Data Source: Netflix Titles Dataset")  # Update if needed
+    st.write("Data Source: Netflix Titles Dataset")
